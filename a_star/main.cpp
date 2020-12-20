@@ -43,8 +43,13 @@ vector<vector<State>> ReadBoardFile(string path) {
   return board;
 }
 
-// TODO: Write the Search function stub here.
-vector<vector<State>> Search(vector<vector<State>> board, vector<int> init, vector<int> goal) {
+// search heuristic:
+int Heuristic(int x1, int y1, int x2, int y2) {
+	return abs(x2-x1)+abs(y2-y1);
+}
+
+// search function: implements A*
+vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[2]) {
   vector<vector<State>> solution = {};
   cout << "No path found!" << "\n";
   return solution;
@@ -69,13 +74,9 @@ void PrintBoard(const vector<vector<State>> board) {
 
 
 int main() {
-  // TODO: Declare "init" and "goal" arrays with values {0, 0} and {4, 5} respectively.
-  auto board = ReadBoardFile("1.board");
-  // TODO: Call Search with "board", "init", and "goal". Store the results in the variable "solution".
-  vector<int> init{0,0};
-  vector<int> goal{4,5};
-  vector<vector<State>> solution;
-  solution = Search(board, init, goal);
-  // TODO: Change the following line to pass "solution" to PrintBoard.
+  int init[2]{0, 0};
+  int goal[2]{4, 5};
+  vector<vector<State>> board = ReadBoardFile("1.board");
+  vector<vector<State>> solution = Search(board, init, goal);
   PrintBoard(solution);
 }

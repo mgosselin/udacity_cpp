@@ -11,7 +11,7 @@ using std::string;
 using std::vector;
 using std::abs;
 
-enum class State {kEmpty, kClosed, kObstacle};
+enum class State {kEmpty, kClosed, kObstacle, kPath};
 
 
 vector<State> ParseLine(string line) {
@@ -73,6 +73,18 @@ vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[
   int g = 0;
   int h = Heuristic(init[0],init[1],goal[0],goal[1]);
   vector<int> node{x,y,g,h};
+
+  // so long as there are open nodes left, sort them, then get the "current" one
+  while(open.size() > 0) {
+    CellSort(&open);
+    vector<int> current = open.back();
+    open.pop_back();
+    grid[current[0]][current[1]] = State::kPath;
+    cout << current[0] << ", " << current[1] << "\n";
+    if(current[0] == goal[0] && current[1] == goal [1]) {
+      return grid;
+    }
+  }
   
   // add the starting node to the open vector
   AddToOpen(x,y,g,h,open,grid);

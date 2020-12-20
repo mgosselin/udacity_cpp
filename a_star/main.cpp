@@ -11,8 +11,10 @@ using std::string;
 using std::vector;
 using std::abs;
 
-enum class State {kEmpty, kClosed, kObstacle, kPath};
+enum class State {kStart, kFinish, kEmpty, kClosed, kObstacle, kPath};
 
+// a small array to loop over when expanding to immediate nearby nodes
+const int delta[4][2]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
 vector<State> ParseLine(string line) {
     istringstream sline(line);
@@ -115,7 +117,8 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
   int y = init[1];
   int g = 0;
   int h = Heuristic(init[0],init[1],goal[0],goal[1]);
-  vector<int> node{x,y,g,h};
+  // add the starting node to the open vector
+  AddToOpen(x,y,g,h,open,grid);
 
   // so long as there are open nodes left, sort them, then get the "current" one
   while(open.size() > 0) {
@@ -123,16 +126,15 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
     vector<int> current = open.back();
     open.pop_back();
     grid[current[0]][current[1]] = State::kPath;
-    // cout << current[0] << ", " << current[1] << "\n";
+
     if(current[0] == goal[0] && current[1] == goal [1]) {
+      grid[init[0]][init[1]] = State::kStart;
+      grid[goal[0]][goal[1]] = State::kFinish;
       return grid;
     }
     // if we didn't arrive at the goal, expand the candidate nodes
     ExpandNeighbors(current, goal, open, grid);
   }
-  
-  // add the starting node to the open vector
-  AddToOpen(x,y,g,h,open,grid);
 
   cout << "No path found!" << "\n";
   return std::vector<vector<State>>{};
@@ -141,6 +143,9 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
 string CellString(State cell) {
   switch(cell) {
     case State::kObstacle: return "⛰️   ";
+    case State::kPath: return "🚗  ";
+    case State::kStart: return "🚦  ";
+    case State::kFinish: return "🏁   ";
     default: return "0   "; 
   }
 }
@@ -155,6 +160,7 @@ void PrintBoard(const vector<vector<State>> board) {
   }
 }
 
+#include "test.cpp"
 
 int main() {
   int init[2]{0, 0};
@@ -162,4 +168,12 @@ int main() {
   vector<vector<State>> board = ReadBoardFile("1.board");
   vector<vector<State>> solution = Search(board, init, goal);
   PrintBoard(solution);
+  
+  // Tests, provided by Udacity
+  TestHeuristic();
+  TestAddToOpen();
+  TestCompare();
+  TestSearch();
+  TestCheckValidCell();
+  TestExpandNeighbors();
 }

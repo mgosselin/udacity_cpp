@@ -11,7 +11,7 @@ using std::string;
 using std::vector;
 using std::abs;
 
-enum class State {kEmpty, kObstacle};
+enum class State {kEmpty, kClosed, kObstacle};
 
 
 vector<State> ParseLine(string line) {
@@ -43,16 +43,35 @@ vector<vector<State>> ReadBoardFile(string path) {
   return board;
 }
 
-// search heuristic:
+// search heuristic
 int Heuristic(int x1, int y1, int x2, int y2) {
 	return abs(x2-x1)+abs(y2-y1);
 }
 
+// Add to the list of open nodes to explore
+void AddToOpen(int x, int y, int g, int h, vector<vector<int>> &open, vector<vector<State>> &grid) {
+  vector<int> node{x, y, g, h};
+  open.push_back(node);
+  grid[x][y] = State::kClosed;
+}
+
 // search function: implements A*
 vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[2]) {
-  vector<vector<State>> solution = {};
+// Create the vector of open nodes.
+  vector<vector<int>> open {};
+  
+  // TODO: Initialize the starting node. 
+  int x = init[0];
+  int y = init[1];
+  int g = 0;
+  int h = Heuristic(init[0],init[1],goal[0],goal[1]);
+  vector<int> node{x,y,g,h};
+  
+  // add the starting node to the open vector
+  AddToOpen(x,y,g,h,open,grid);
+
   cout << "No path found!" << "\n";
-  return solution;
+  return std::vector<vector<State>>{};
 }
 
 string CellString(State cell) {

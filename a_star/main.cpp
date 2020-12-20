@@ -60,11 +60,49 @@ void CellSort(vector<vector<int>> *v) {
   sort(v->begin(), v->end(), Compare);
 }
 
+// check if a new candidate node is a valid one
+bool CheckValidCell(int x, int y, vector<vector<State>> &grid) {
+	bool response = 0;
+  	int x_dim = grid.size();
+  	int y_dim = grid[0].size();
+  	// check that we're on the grid
+  	if((x>=0&&x<x_dim)&&(y>=0&&y<y_dim)) {
+      	// check if it's an empty space
+    	if(grid[x][y]==State::kEmpty){
+        	response = 1;
+        }
+    }
+    return response;
+}
+
 // Add to the list of open nodes to explore
 void AddToOpen(int x, int y, int g, int h, vector<vector<int>> &open, vector<vector<State>> &grid) {
   vector<int> node{x, y, g, h};
   open.push_back(node);
   grid[x][y] = State::kClosed;
+}
+
+// explore for new neighbor nodes, check their validity, add the valid ones
+void ExpandNeighbors(vector<int> &current, int goal[2], vector<vector<int>> &open, vector<vector<State>> &grid) {
+  int x = current[0];
+  int y = current[1];
+  int g = current[2];
+  
+  const vector<vector<int>> offsets = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+  
+  // loop over the four adjacent cells
+  for(int i=0; i<4; i++){
+    int neighbor_x = x + offsets[i][0];
+    int neighbor_y = y + offsets[i][1];
+    
+    // check if valid cell
+    if(CheckValidCell(neighbor_x, neighbor_y, grid)){
+      // add a new cell
+      int g2 = g+1;
+      int h2 = Heuristic(neighbor_x, neighbor_y, goal[0], goal[1]);
+      AddToOpen(neighbor_x, neighbor_y, g2, h2, open, grid);
+    }
+  }
 }
 
 // search function: implements A*
@@ -85,10 +123,12 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
     vector<int> current = open.back();
     open.pop_back();
     grid[current[0]][current[1]] = State::kPath;
-    cout << current[0] << ", " << current[1] << "\n";
+    // cout << current[0] << ", " << current[1] << "\n";
     if(current[0] == goal[0] && current[1] == goal [1]) {
       return grid;
     }
+    // if we didn't arrive at the goal, expand the candidate nodes
+    ExpandNeighbors(current, goal, open, grid);
   }
   
   // add the starting node to the open vector

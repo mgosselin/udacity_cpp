@@ -1,2 +1,5 @@
-bash:
-g++ -std=c++11 main.cpp
+Compile:
+`g++ -std=c++11 main.cpp`
+
+Run:
+`./a.out`

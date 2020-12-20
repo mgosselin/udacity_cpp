@@ -55,6 +55,11 @@ int Heuristic(int x1, int y1, int x2, int y2) {
 	return abs(x2-x1)+abs(y2-y1);
 }
 
+// sort the vector of nodes
+void CellSort(vector<vector<int>> *v) {
+  sort(v->begin(), v->end(), Compare);
+}
+
 // Add to the list of open nodes to explore
 void AddToOpen(int x, int y, int g, int h, vector<vector<int>> &open, vector<vector<State>> &grid) {
   vector<int> node{x, y, g, h};
@@ -63,7 +68,7 @@ void AddToOpen(int x, int y, int g, int h, vector<vector<int>> &open, vector<vec
 }
 
 // search function: implements A*
-vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[2]) {
+vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2]) {
 // Create the vector of open nodes.
   vector<vector<int>> open {};
   

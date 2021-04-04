@@ -12,12 +12,25 @@ using std::set;
 using std::size_t;
 using std::string;
 using std::vector;
+using std::sort;
+
+// Constructor:
+System::System() {
+  // get process ids
+  pids_ = LinuxParser::Pids();
+  // populate vector of system processes
+  for (unsigned int i=0; i<pids_.size(); i++) { processes_.push_back( Process(pids_[i]) ); }
+  // sort the processes
+  sort(processes_.begin(), processes_.end(), [](Process a, Process b){return a < b;} );
+}
 
 // DONE: Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
 
-// TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() { return processes_; }
+// DONE: Return a container composed of the system's processes
+vector<Process>& System::Processes() {
+  sort(processes_.begin(), processes_.end(), [](Process a, Process b){return a < b;} );
+  return processes_; }
 
 // DONE: Return the system's kernel identifier (string)
 std::string System::Kernel() { return LinuxParser::Kernel(); }

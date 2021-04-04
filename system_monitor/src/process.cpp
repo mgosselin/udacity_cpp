@@ -18,8 +18,14 @@ Process::Process(int pid) {
 // DONE: Return this process's ID
 int Process::Pid() { return pid_; }
 
-// TODO: Return this process's CPU utilization
-float Process::CpuUtilization() { return 0; }
+// DONE: Return this process's CPU utilization
+float Process::CpuUtilization() const {
+  // this calculation from:
+  // https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
+  float elapsed_time_s = (float)LinuxParser::UpTime() - (float)LinuxParser::StartJiffies(pid_) / (float)sysconf(_SC_CLK_TCK);
+  float active_time_s = (float)LinuxParser::ActiveJiffies(pid_) / (float)sysconf(_SC_CLK_TCK);
+  return active_time_s / elapsed_time_s;
+}
 
 // DONE: Return the command that generated this process
 string Process::Command() {
